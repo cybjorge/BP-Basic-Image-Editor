@@ -21,4 +21,9 @@
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="image4.bmp">
+      <Filter>src</Filter>
+    </Image>
+  </ItemGroup>
 </Project>
