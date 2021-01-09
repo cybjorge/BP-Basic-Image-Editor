@@ -1,29 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="src">
-      <UniqueIdentifier>{5ede101e-c6fc-4061-8785-e6b25d3ef73d}</UniqueIdentifier>
-    </Filter>
+    <ClInclude Include="Image.h" />
+    <ClInclude Include="stb_image.h" />
+    <ClInclude Include="stb_image_write.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stb_image.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="Image.h">
-      <Filter>src</Filter>
-    </ClInclude>
+    <ClCompile Include="Image.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="Image.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
+    <Image Include="image4.bmp" />
+    <Image Include="PD.png" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="image4.bmp">
-      <Filter>src</Filter>
-    </Image>
+    <Text Include="a.txt" />
   </ItemGroup>
 </Project>
