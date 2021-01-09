@@ -114,3 +114,8 @@ Histogram::Histogram()
 		histogram_data[i] = 0;
 	}
 }
+
+Histogram::~Histogram()
+{
+	free(histogram_data);
+}

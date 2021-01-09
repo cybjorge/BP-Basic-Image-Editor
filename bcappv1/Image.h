@@ -11,6 +11,7 @@ struct Histogram
 	int histogram_data[HIST_ARRAY_SIZE];
 
 	Histogram();
+	~Histogram();
 };
 
 struct Image{
