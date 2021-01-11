@@ -10,6 +10,7 @@ Image::Image(const char* filename)
 {
 	if (read(filename)) {
 		printf("Success reading %s \n", filename);
+		stats(filename);
 		size = width * height * channels;
 	}
 	else {
@@ -83,6 +84,20 @@ ImageType Image::imageFileType(const char* filename) {
 	}
 	return NONE;
 }
+Image& Image::grayscale ()
+{
+	if (channels < 3) {
+		printf("Sorry, but it seems that image has less than 3 (RGB) channels");
+	}
+	else{
+		for (int i = 0; i < size; i += channels) {
+			int grayscale = (data[i] + data[i + 1] + data[i + 2]) / 3;
+			memset(data + i, grayscale, 3);//if there are 4 channels, make channels-1
+		}
+	}
+	return *this;
+
+}
 Histogram Image::histogram(int desired_channel) {
 
 	Histogram H_data;
@@ -101,6 +116,14 @@ Histogram Image::histogram(int desired_channel) {
 	}
 
 	return H_data;
+}
+
+void Image::stats(const char* filename)
+{
+	printf("Image width x image heigth: %d  x %d \n", width, height);
+	printf("Number of color channels: %d \n", channels);
+	printf("Image size inn Bites: %d \n", size);
+	printf("Image format: %s", imageFileType(filename));
 }
 
 Histogram Image::histogram()

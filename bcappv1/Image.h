@@ -4,7 +4,10 @@
 #define HIST_ARRAY_SIZE 256
 
 enum ImageType {
-	PNG, BMP, JPG,NONE
+	PNG, 
+	BMP,
+	JPG,
+	NONE
 };
 struct Histogram
 {
@@ -25,6 +28,8 @@ struct Image{
 	Image(int width, int height, int channels);
 	Image(const Image& img);
 	~Image();
+	//image stats
+	void stats(const char* filename);
 
 	//histogram
 	Histogram histogram();
@@ -34,4 +39,6 @@ struct Image{
 	bool write(const char* filename);
 
 	ImageType imageFileType(const char* filename);
+
+	Image& grayscale ();
 };
