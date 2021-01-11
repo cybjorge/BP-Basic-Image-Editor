@@ -41,4 +41,5 @@ struct Image{
 	ImageType imageFileType(const char* filename);
 
 	Image& grayscale ();
+	Image& filterChannel(float r, float g, float b);
 };

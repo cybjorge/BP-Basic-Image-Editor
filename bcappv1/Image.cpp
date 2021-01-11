@@ -98,6 +98,21 @@ Image& Image::grayscale ()
 	return *this;
 
 }
+
+Image& Image::filterChannel(float r, float g, float b)
+{
+	if (channels < 3) {
+		printf("Sorry, but it seems that this image doesnt have enough color channels to preform this action");
+	}
+	else {
+		for (int i = 0; i < size; i += channels) {
+			data[i] = data[i] * r;
+			data[i+1] = data[i + 1] * g;
+			data[i+2] = data[i + 2] * b;
+		}
+	}
+	return *this;
+}
 Histogram Image::histogram(int desired_channel) {
 
 	Histogram H_data;
@@ -123,7 +138,7 @@ void Image::stats(const char* filename)
 	printf("Image width x image heigth: %d  x %d \n", width, height);
 	printf("Number of color channels: %d \n", channels);
 	printf("Image size inn Bites: %d \n", size);
-	printf("Image format: %s", imageFileType(filename));
+	//printf("Image format: %s", imageFileType(filename));
 }
 
 Histogram Image::histogram()
