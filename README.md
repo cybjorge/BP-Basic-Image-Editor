@@ -14,7 +14,7 @@ TO DO:
 Histograms:
   -add binded histogram
   -add cumulative histogram
-  -add grayscale option, 
+  -add grayscale option(done), 
 
 -Statistic informations from histogram:
     -add statistic showcase, such as median, mean, variance, etc (calculation and display)
