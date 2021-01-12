@@ -4,7 +4,6 @@ Showcase of learned informatoin and skills for bachelor degree project
 
 TO DO:
 
--define max bit size of pixel for demonstration
 
 -UI:
   -add user interface - console level
