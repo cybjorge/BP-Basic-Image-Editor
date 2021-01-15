@@ -2,9 +2,16 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #define STBI_FAILURE_USERMSG
 
+
 #include "Image.h"
 #include "stb_image.h"
 #include "stb_image_write.h"
+#include <algorithm>
+
+//declarations for functions needed to perform some operations
+int find_min(int arr[],int sz);
+int find_max(int arr[],int sz);
+int clamp(int channelValue);
 
 Image::Image(const char* filename)
 {
@@ -84,35 +91,7 @@ ImageType Image::imageFileType(const char* filename) {
 	}
 	return NONE;
 }
-Image& Image::grayscale ()
-{
-	if (channels < 3) {
-		printf("Sorry, but it seems that image has less than 3 (RGB) channels");
-	}
-	else{
-		for (int i = 0; i < size; i += channels) {
-			int grayscale = (data[i] + data[i + 1] + data[i + 2]) / 3;
-			memset(data + i, grayscale, 3);//if there are 4 channels, make channels-1
-		}
-	}
-	return *this;
 
-}
-
-Image& Image::filterChannel(float r, float g, float b)
-{
-	if (channels < 3) {
-		printf("Sorry, but it seems that this image doesnt have enough color channels to preform this action");
-	}
-	else {
-		for (int i = 0; i < size; i += channels) {
-			data[i] = data[i] * r;
-			data[i+1] = data[i + 1] * g;
-			data[i+2] = data[i + 2] * b;
-		}
-	}
-	return *this;
-}
 Histogram Image::histogram(int desired_channel) {
 
 	Histogram H_data;
@@ -156,4 +135,103 @@ Histogram::Histogram()
 Histogram::~Histogram()
 {
 	free(histogram_data);
+}
+
+
+//point operations
+Image& Image::grayscale()
+{
+	if (channels < 3) {
+		printf("Sorry, but it seems that image has less than 3 (RGB) channels");
+	}
+	else {
+		for (int i = 0; i < size; i += channels) {
+			int grayscale = (data[i] + data[i + 1] + data[i + 2]) / 3;
+			memset(data + i, grayscale, 3);//if there are 4 channels, make channels-1
+		}
+	}
+	return *this;
+
+}
+
+Image& Image::adjustContrast(float value)
+{
+	float contrast = ((259 * (value * 255)) / (255 * (259 - value)));
+	if (channels < 3) {
+		printf("Sorry, but it seems that image has less than 3 (RGB) channels");
+	}
+	else {
+		for (int i = 0; i < size; i += channels) {
+			int pixel[3] = { data[i],data[i + 1],data[i + 2] };
+			int diff = (find_max(pixel, 3) - find_min(pixel, 3));
+			int b = (int)(diff * value);
+			/*
+			* if (b > 255) {
+				b = 255;
+			}
+			*/
+			
+
+			data[i] = clamp(contrast*(data[i] -128)+128);
+			data[i+1] = clamp(contrast * (data[i+1] - 128) + 128);
+			data[i+2] = clamp(contrast * (data[i+2] - 128) + 128);
+			
+			/*
+			 int min = find_min(pixel,3);
+			int max = find_max(pixel,3);
+			*/
+			
+
+			//memset(data + i, b, 3);
+
+		}
+	}
+	return *this;
+}
+
+Image& Image::filterChannel(float r, float g, float b)
+{
+	if (channels < 3) {
+		printf("Sorry, but it seems that this image doesnt have enough color channels to preform this action");
+	}
+	else {
+		for (int i = 0; i < size; i += channels) {
+			data[i] = data[i] * r;
+			data[i + 1] = data[i + 1] * g;
+			data[i + 2] = data[i + 2] * b;
+		}
+	}
+	return *this;
+}
+
+
+
+//useful functions
+int find_min(int arr[], int sz) {
+	int min = 256;
+	for (int i = 0; i < sz; i++) {
+		if (arr[i] < min) {
+			min = arr[i];
+		}
+	}
+	return min;
+}
+int find_max(int arr[], int sz) {
+	int max = 0;
+	for (int i = 0; i < sz; i++) {
+		if (arr[i] > max) {
+			max = arr[i];
+		}
+	}
+	return max;
+}
+
+int clamp(int channelValue) {
+	if (channelValue < 0) {
+		return 0;
+	}
+	else if (channelValue > 255) {
+		return 255;
+	}
+	return channelValue;
 }

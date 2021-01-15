@@ -10,6 +10,12 @@ int main(int argc, char* argv[])
     Image test("/home/pi/projects/bcappv1/JPGtest.jpg");
     Image gray=test;
     Image filter = test;
+    Image contrast = test;
+
+    contrast.adjustContrast(1.5);
+    contrast.write("contrastTest.jpg");
+
+
     gray.grayscale();
     gray.write("PDGRAY.jpg");
 
