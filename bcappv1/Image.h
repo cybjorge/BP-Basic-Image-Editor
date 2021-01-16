@@ -43,4 +43,5 @@ struct Image{
 	Image& grayscale ();
 	Image& filterChannel(float r, float g, float b);
 	Image& adjustContrast(float value);
+	Image& adjustBrightness(float value);
 };

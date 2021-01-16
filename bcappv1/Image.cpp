@@ -189,6 +189,21 @@ Image& Image::adjustContrast(float value)
 	return *this;
 }
 
+Image& Image::adjustBrightness(float value)
+{
+	if (channels < 3) {
+		printf("Sorry, but it seems that image has less than 3 (RGB) channels");
+	}
+	else {
+		for (int i = 0; i < size; i += channels) {
+			data[i] = clamp(value + data[i]);
+			data[i + 1] = clamp(value + data[i+1]);
+			data[i + 2] = clamp(value + data[i+2]);
+		}
+	}
+	return *this;
+}
+
 Image& Image::filterChannel(float r, float g, float b)
 {
 	if (channels < 3) {
@@ -207,6 +222,7 @@ Image& Image::filterChannel(float r, float g, float b)
 
 
 //useful functions
+
 int find_min(int arr[], int sz) {
 	int min = 256;
 	for (int i = 0; i < sz; i++) {
