@@ -16,5 +16,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="a.txt" />
+    <Text Include="possibilities.txt" />
   </ItemGroup>
 </Project>

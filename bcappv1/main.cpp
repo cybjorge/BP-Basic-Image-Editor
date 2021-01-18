@@ -19,6 +19,10 @@ int main(int argc, char* argv[])
     Image filter = test;
     Image contrast = test;
     Image brightness = test;
+    Image inver = test;
+
+    inver.invert();
+    inver.write("inverted.jpg");
 
     brightness.adjustBrightness(-20);
     brightness.write("brtest.jpg");

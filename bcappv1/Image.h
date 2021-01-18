@@ -19,6 +19,7 @@ struct Histogram
 
 struct Image{
 	uint8_t* data = NULL;
+	uint8_t* dataInArray[HIST_ARRAY_SIZE][HIST_ARRAY_SIZE];
 	size_t size = 0;
 	int width;
 	int height;
@@ -39,9 +40,14 @@ struct Image{
 	bool write(const char* filename);
 
 	ImageType imageFileType(const char* filename);
-
+	//point operations declarations
 	Image& grayscale ();
 	Image& filterChannel(float r, float g, float b);
 	Image& adjustContrast(float value);
 	Image& adjustBrightness(float value);
+	Image& invert();
+
+	//filter declarations
+	Image& boxFilterTxT();
+
 };

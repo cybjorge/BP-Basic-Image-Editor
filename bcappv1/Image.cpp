@@ -12,6 +12,7 @@
 int find_min(int arr[],int sz);
 int find_max(int arr[],int sz);
 int clamp(int channelValue);
+uint8_t to2darray(uint8_t unsortedData);
 
 Image::Image(const char* filename)
 {
@@ -156,15 +157,22 @@ Image& Image::grayscale()
 
 Image& Image::adjustContrast(float value)
 {
-	float contrast = ((259 * (value * 255)) / (255 * (259 - value)));
+	float contrast = ((255 * (value * 255)) / (255 * (255 - value)));
 	if (channels < 3) {
 		printf("Sorry, but it seems that image has less than 3 (RGB) channels");
 	}
 	else {
 		for (int i = 0; i < size; i += channels) {
+			//will be useful for auto contrast
+			/*
+			* 			
 			int pixel[3] = { data[i],data[i + 1],data[i + 2] };
 			int diff = (find_max(pixel, 3) - find_min(pixel, 3));
-			int b = (int)(diff * value);
+			int r = (255*(data[i]- find_max(pixel, 3)))/diff;
+			int g = (255 * (data[i+1] - find_max(pixel, 3))) / diff;
+			int b = (255 * (data[i+2] - find_max(pixel, 3))) / diff;
+			*/
+
 			/*
 			* if (b > 255) {
 				b = 255;
@@ -187,6 +195,35 @@ Image& Image::adjustContrast(float value)
 		}
 	}
 	return *this;
+}
+
+Image& Image::invert()
+{
+	int maxVal=255;
+	for (int i = 0; i < size; i += channels) {
+		data[i] = maxVal-data[i];
+		data[i + 1] = maxVal - data[i+1];
+		data[i + 2] = maxVal - data[i + 2];
+	}
+	return *this;
+}
+
+
+
+Image& Image::boxFilterTxT()
+{
+	int m = width;
+	int n = height;
+	uint8_t* filterData = data;
+
+	uint pixelArr[3][3];
+	//next row offset is width
+	//start at +1 pixel == start with value 3 (representing pixel) and at 2nd row
+	for (int u = channels; u < m - 2*channels; u += channels) {
+		for (int v = 1; v < n - 1; v += channels) {
+			
+		}
+	}
 }
 
 Image& Image::adjustBrightness(float value)
@@ -219,7 +256,7 @@ Image& Image::filterChannel(float r, float g, float b)
 	return *this;
 }
 
-
+/*pridat autocontrast moznost*/
 
 //useful functions
 
@@ -251,3 +288,4 @@ int clamp(int channelValue) {
 	}
 	return channelValue;
 }
+
