@@ -20,6 +20,10 @@ int main(int argc, char* argv[])
     Image contrast = test;
     Image brightness = test;
     Image inver = test;
+    Image boxF = test;
+
+    boxF.boxFilterTxT();
+    boxF.write("bFilter.jpg");
 
     inver.invert();
     inver.write("inverted.jpg");

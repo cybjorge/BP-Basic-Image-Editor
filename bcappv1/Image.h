@@ -25,6 +25,7 @@ struct Image{
 	int height;
 	int channels;
 
+
 	Image(const char* filename);
 	Image(int width, int height, int channels);
 	Image(const Image& img);

@@ -216,14 +216,27 @@ Image& Image::boxFilterTxT()
 	int n = height;
 	uint8_t* filterData = data;
 
-	uint pixelArr[3][3];
+	
 	//next row offset is width
 	//start at +1 pixel == start with value 3 (representing pixel) and at 2nd row
-	for (int u = channels; u < m - 2*channels; u += channels) {
-		for (int v = 1; v < n - 1; v += channels) {
-			
+	for (int u = channels+width; u < size-(channels*width); u += channels) {
+		int downOffset = (u - width);
+		if (downOffset < 0) {
+			downOffset *= -1;
 		}
+		int upOffset = (u + width);
+		int avgRed = (data[downOffset - 3] + data[downOffset] + data[downOffset + 3] + data[u - 3] + data[u] + data[u + 3] + data[upOffset - 3] + data[upOffset] + data[upOffset + 3]) / 9;
+		int avgGreen = (data[downOffset - 2] + data[downOffset + 1] + data[downOffset + 4] + data[u - 2] + data[u + 1] + data[u + 4] + data[upOffset - 2] + data[upOffset + 1] + data[upOffset + 4]) / 9;
+		int avgBlue = (data[downOffset - 1] + data[downOffset + 2] + data[downOffset + 5] + data[u - 1] + data[u + 2] + data[u + 5] + data[upOffset - 1] + data[upOffset + 2] + data[upOffset + 5]) / 9;
+		filterData[u] = avgRed;
+		filterData[u + 1] = avgGreen;
+		filterData[u + 2] = avgBlue;
 	}
+	/*for (int i = 0; i < width * height * channels; i++) {
+		memset(data + i, (int)filterData + i, 1);
+	}*/
+	data = filterData;
+	return *this;
 }
 
 Image& Image::adjustBrightness(float value)
