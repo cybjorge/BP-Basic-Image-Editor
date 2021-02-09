@@ -14,12 +14,11 @@ struct Histogram
 	int histogram_data[HIST_ARRAY_SIZE];
 
 	Histogram();
-	~Histogram();
+	//~Histogram();
 };
 
 struct Image{
 	uint8_t* data = NULL;
-	uint8_t* dataInArray[HIST_ARRAY_SIZE][HIST_ARRAY_SIZE];
 	size_t size = 0;
 	int width;
 	int height;

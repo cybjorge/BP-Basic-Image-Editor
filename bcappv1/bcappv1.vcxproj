@@ -76,11 +76,13 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
+    <ClCompile Include="cameraControls.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Makefile" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cameraControls.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="stb_image_write.h" />

@@ -1297,9 +1297,7 @@ static FILE *stbi__fopen(char const *filename, char const *mode)
    if (0 != fopen_s(&f, filename, mode))
       f=0;
 #else
-   system("pwd");
    f = fopen(filename, mode);
-   perror("fopen");
 
        
 #endif

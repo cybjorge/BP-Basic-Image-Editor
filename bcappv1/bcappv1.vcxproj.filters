@@ -4,11 +4,13 @@
     <ClInclude Include="Image.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="stb_image_write.h" />
+    <ClInclude Include="cameraControls.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Makefile" />
+    <ClCompile Include="cameraControls.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="image4.bmp" />

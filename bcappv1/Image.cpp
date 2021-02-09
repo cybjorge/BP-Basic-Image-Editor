@@ -18,8 +18,9 @@ Image::Image(const char* filename)
 {
 	if (read(filename)) {
 		printf("Success reading %s \n", filename);
-		stats(filename);
 		size = width * height * channels;
+		stats(filename);
+		
 	}
 	else {
 		perror("read");
@@ -117,13 +118,12 @@ void Image::stats(const char* filename)
 {
 	printf("Image width x image heigth: %d  x %d \n", width, height);
 	printf("Number of color channels: %d \n", channels);
-	printf("Image size inn Bites: %d \n", size);
-	//printf("Image format: %s", imageFileType(filename));
+	printf("Image size in Bites: %d B\n", size);
 }
 
 Histogram Image::histogram()
 {
-	return histogram(NULL);
+	return histogram(0);
 }
 
 Histogram::Histogram()
@@ -133,11 +133,11 @@ Histogram::Histogram()
 	}
 }
 
-Histogram::~Histogram()
+/*Histogram::~Histogram()
 {
 	free(histogram_data);
 }
-
+*/
 
 //point operations
 Image& Image::grayscale()
