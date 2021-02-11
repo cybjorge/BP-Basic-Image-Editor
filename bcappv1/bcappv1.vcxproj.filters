@@ -9,7 +9,6 @@
   <ItemGroup>
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Makefile" />
     <ClCompile Include="cameraControls.cpp" />
   </ItemGroup>
   <ItemGroup>
