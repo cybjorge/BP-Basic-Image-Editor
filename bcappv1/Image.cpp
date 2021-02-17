@@ -19,7 +19,7 @@ Image::Image(const char* filename)
 	if (read(filename)) {
 		printf("Success reading %s \n", filename);
 		size = width * height * channels;
-		stats(filename);
+		type = imageFileType(filename);
 		
 	}
 	else {
@@ -138,6 +138,36 @@ Histogram::Histogram()
 	free(histogram_data);
 }
 */
+
+//uint8_t *pixel(Image img,int x, int y) {
+//	int position;
+//	switch (img.type)
+//	{
+//	case PNG:
+//		position = (y * img.width + x)*4;
+//		position = *img.data + position;
+//
+//		return &img.data[position];
+//		
+//		break;
+//	case BMP:
+//		position = (y * img.width + x) * 3;
+//		return img.data + position;
+//		break;
+//	case JPG:
+//		position = (y * img.width + x) * 3;
+//		position = *img.data + position;
+//		return img.data + position;
+//		break;
+//	case NONE:
+//		return nullptr;
+//		break;
+//	default:
+//		return nullptr;
+//		break;
+//	}
+//	
+//}
 
 //point operations
 Image& Image::grayscale()

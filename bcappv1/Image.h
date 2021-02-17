@@ -20,6 +20,7 @@ struct Histogram
 struct Image{
 	uint8_t* data = NULL;
 	size_t size = 0;
+	ImageType type;
 	int width;
 	int height;
 	int channels;
@@ -47,7 +48,11 @@ struct Image{
 	Image& adjustBrightness(float value);
 	Image& invert();
 
+	//pixel
+
+
 	//filter declarations
 	Image& boxFilterTxT();
 
 };
+//uint8_t* pixel(Image img, int x, int y);
