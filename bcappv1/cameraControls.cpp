@@ -21,64 +21,74 @@
 
 using namespace std;
 uint8_t* buf;
+int buflen;
 
-int check()
-{	//check whether camera is connected
-	int camD;//camera descriptor
-	camD = open("/dev/video0", O_RDWR);
+int camera_check(int cd)
+{	
+	//check whether camera is connected
+	//if camera is connected, proceeds to initliaze buffers, sets resolution and captures the requested frame
 
-	if (camD<0) {
+
+	if (cd<0) {
 		cout << "No camera is connected \n";
-		close(camD);
+		close(cd);
 		return -1;
 	}
 	else {
-		//check if camera can take a picture
 		cout << "Camera is connected \n";
-		v4l2_capability capability;
-		if (ioctl(camD, VIDIOC_QUERYCAP, &capability) < 0) {
-			//camera is not capable of taking a picture or something went wrong
-			cout << "Failed to retrieve device capability, error at VIDIOC_QUERYCAP";
-		}
-		if (setRF(camD) < 0) {
-			cout << "unable to set resolution";
-		}
-		if (setBuffer(camD) < 0) {
-			cout << "buffer not set";
-		}
-		if (makeFrame(camD) < 0) {
-			cout << "idk man im tired";
-		}
 	}
-	close(camD);
-	return 0;
-
+	return cd;
+}
+uint8_t* camera_record_init(int cd) {
+	if (capability(cd) < 0) {
+		cout << "unable to retrieve device capability";
+		return nullptr;
+	}
+	if (set_r_f(cd) < 0) {
+		cout << "unable to set resolution";
+		return nullptr;
+	}
+	if (set_buffer(cd) < 0) {
+		cout << "buffer not set";
+		return nullptr;
+	}
+	if (make_frame(cd) < 0) {
+		cout << "unable to capture frame";
+		return nullptr;
+	}
+	if (stop_stream(cd) < 0) {
+		cout << "unable to stop stream";
+		return nullptr;
+	}
+	close(cd);
+	return buf;
 }
 
-int setRF(int cameraDescriptor) {
-	//set resolution and format of recorded picture
+int capability(int cd) {
+	v4l2_capability capability;
+	if (ioctl(cd, VIDIOC_QUERYCAP, &capability) < 0) {
+		perror("VIDIOC_QUERYCAP");
+		return -1;
+	}
+}
+
+int set_r_f(int cd) {
 	
-	/*TODO*/
-	//make this customisable, f.e. width, height, format etc.
-
-
 	v4l2_format imageRF;
-	v4l2_pix_format res;
 	imageRF.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-	//cameras native resolution
-	imageRF.fmt.pix.width = 1270;
+	imageRF.fmt.pix.width = 1280;
 	imageRF.fmt.pix.height = 720;
 	imageRF.fmt.pix.pixelformat = V4L2_PIX_FMT_JPEG;
 	imageRF.fmt.pix.field = V4L2_FIELD_NONE;
 
-	if (ioctl(cameraDescriptor, VIDIOC_S_FMT, &imageRF) < 0) {
+	if (ioctl(cd, VIDIOC_S_FMT, &imageRF) < 0) {
 		cout << " VIDIOC_S_FMT error, unable to set resolution";
 		return -1;
 	}
 	return 0;
 }
 
-int setBuffer(int cameraDescriptor)
+int set_buffer(int cd)
 {
 	//requesting buffer from device and allocating space
 	v4l2_requestbuffers requestedBuffer = { 0 };
@@ -86,7 +96,7 @@ int setBuffer(int cameraDescriptor)
 	requestedBuffer.memory = V4L2_MEMORY_MMAP;
 	requestedBuffer.count = 1;
 
-	if (ioctl(cameraDescriptor, VIDIOC_REQBUFS, &requestedBuffer) < 0) {
+	if (ioctl(cd, VIDIOC_REQBUFS, &requestedBuffer) < 0) {
 		perror("VIDIOC_REQBUFS error");
 		return -1;
 	}
@@ -99,43 +109,58 @@ int setBuffer(int cameraDescriptor)
 	querryBuffer.memory = V4L2_MEMORY_MMAP;
 	querryBuffer.index = 0;
 
-	if (ioctl(cameraDescriptor, VIDIOC_QUERYBUF, &querryBuffer) < 0) {
+	if (ioctl(cd, VIDIOC_QUERYBUF, &querryBuffer) < 0) {
 		perror("VIDIOC_QUERYBUF error");
 		return -1;
 	}
-	buf = (uint8_t*) mmap(NULL, querryBuffer.length, PROT_READ | PROT_WRITE, MAP_SHARED, cameraDescriptor, querryBuffer.m.offset);
+	buf = (uint8_t*) mmap(NULL, querryBuffer.length, PROT_READ | PROT_WRITE, MAP_SHARED, cd, querryBuffer.m.offset);
 	memset(buf, 0, querryBuffer.length);
-
+	//buflen = querryBuffer.length;
 	return 0;
 }
 
-int makeFrame(int cameraDescriptor)
+int make_frame(int cd)
 {
 	v4l2_buffer frameBuffer = { 0 };
 	frameBuffer.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	frameBuffer.memory = V4L2_MEMORY_MMAP;
 	frameBuffer.index = 0;
-	if (ioctl(cameraDescriptor, VIDIOC_QBUF, &frameBuffer) < 0) {
-		perror("ONE");
+	if (ioctl(cd, VIDIOC_QBUF, &frameBuffer) < 0) {
+		perror("VIDIOC_QBUF");
 		return -1;
 	}
-	if (ioctl(cameraDescriptor, VIDIOC_STREAMON, &frameBuffer.type) < 0) {
-		perror("TWO");
+	//start streaming
+	if (ioctl(cd, VIDIOC_STREAMON, &frameBuffer.type) < 0) {
+		perror("VIDIOC_STREAMON");
 		return -1;
 	}
 	fd_set fd;
 	FD_ZERO(&fd);
-	FD_SET(cameraDescriptor, &fd);
+	FD_SET(cd, &fd);
 	timeval ctime = { 0 };
 	ctime.tv_sec = 2;
 
-	int cap = select(cameraDescriptor + 1, &fd, NULL, NULL, &ctime);
-	if (ioctl(cameraDescriptor, VIDIOC_DQBUF, &frameBuffer) < 0) {
-		perror("Invalid data");
+	int cap = select(cd + 1, &fd, NULL, NULL, &ctime);
+
+	if (ioctl(cd, VIDIOC_DQBUF, &frameBuffer) < 0) {//dequeue buffer
+		perror("VIDIOC_DQBUF");
 		return -1;
 	}
+
 	int output = open("camerasnap.jpg", O_RDWR | O_CREAT);
 	write(output,buf,frameBuffer.bytesused);
 	close(output);
+	cout << "image saved";
+
+
 	return 0;
+}
+int stop_stream(int cd) {
+	v4l2_buffer frameBuffer = { 0 };
+	frameBuffer.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+	if (ioctl(cd, VIDIOC_STREAMOFF, &frameBuffer) == -1) {
+		perror("VIDIOC_STREAMOFF");
+		return -1;
+	}
+
 }

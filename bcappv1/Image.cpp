@@ -10,8 +10,10 @@
 
 //declarations for functions needed to perform some operations
 int find_min(int arr[],int sz);
+int find_min(uint8_t arr[], int sz,int channels);
 int find_max(int arr[],int sz);
 int clamp(int channelValue);
+int sort();
 uint8_t to2darray(uint8_t unsortedData);
 
 Image::Image(const char* filename)
@@ -26,6 +28,16 @@ Image::Image(const char* filename)
 		perror("read");
 		printf("Error reading %s \n", filename);
 	}
+}
+
+Image::Image(uint8_t* buffer) {
+	this->data = buffer;
+	width = 1280;
+	height = 720;
+	channels = 3;
+	size = width * height * channels;
+	type = JPG;
+	
 }
 
 Image::Image(int width, int height, int channels) : width(width),height(height),channels(channels)
@@ -51,6 +63,12 @@ bool Image::read(const char* filename)
 	return data != NULL;
 }
 
+//bool Image::read(uint8_t* buffer)
+//{
+//	data = stbi_load_from_memory(buffer, bufsize,&width, &height, &channels, 0);
+//	return data != NULL;
+//}
+
 bool Image::write(const char* filename)
 {
 	ImageType type = imageFileType(filename);
@@ -74,6 +92,8 @@ bool Image::write(const char* filename)
 	}
 	return done!=0;
 }
+
+
 ImageType Image::imageFileType(const char* filename) {
 	const char* ext = strrchr(filename, '.');
 	if (ext != nullptr) {
@@ -133,41 +153,6 @@ Histogram::Histogram()
 	}
 }
 
-/*Histogram::~Histogram()
-{
-	free(histogram_data);
-}
-*/
-
-//uint8_t *pixel(Image img,int x, int y) {
-//	int position;
-//	switch (img.type)
-//	{
-//	case PNG:
-//		position = (y * img.width + x)*4;
-//		position = *img.data + position;
-//
-//		return &img.data[position];
-//		
-//		break;
-//	case BMP:
-//		position = (y * img.width + x) * 3;
-//		return img.data + position;
-//		break;
-//	case JPG:
-//		position = (y * img.width + x) * 3;
-//		position = *img.data + position;
-//		return img.data + position;
-//		break;
-//	case NONE:
-//		return nullptr;
-//		break;
-//	default:
-//		return nullptr;
-//		break;
-//	}
-//	
-//}
 
 //point operations
 Image& Image::grayscale()
@@ -193,38 +178,53 @@ Image& Image::adjustContrast(float value)
 	}
 	else {
 		for (int i = 0; i < size; i += channels) {
-			//will be useful for auto contrast
-			/*
-			* 			
-			int pixel[3] = { data[i],data[i + 1],data[i + 2] };
-			int diff = (find_max(pixel, 3) - find_min(pixel, 3));
-			int r = (255*(data[i]- find_max(pixel, 3)))/diff;
-			int g = (255 * (data[i+1] - find_max(pixel, 3))) / diff;
-			int b = (255 * (data[i+2] - find_max(pixel, 3))) / diff;
-			*/
-
-			/*
-			* if (b > 255) {
-				b = 255;
-			}
-			*/
-			
-
 			data[i] = clamp(contrast*(data[i] -128)+128);
 			data[i+1] = clamp(contrast * (data[i+1] - 128) + 128);
 			data[i+2] = clamp(contrast * (data[i+2] - 128) + 128);
-			
-			/*
-			 int min = find_min(pixel,3);
-			int max = find_max(pixel,3);
-			*/
-			
-
-			//memset(data + i, b, 3);
-
 		}
 	}
 	return *this;
+}
+
+Image& Image::boost_color(char channel) {
+	int min = find_min(data, size,channels);
+	int i;
+	switch (channel)
+	{
+	case 'r':
+		i = 0;
+		break;
+	case 'g':
+		i = 1;
+		break;
+	case 'b':
+		i = 2;
+		break;
+	default:
+		break;
+	}
+	for (i; i < size; i += channels) {
+		if (data[i] > 125) {
+			data[i] = 255;
+			data[i+1] = 0;
+			data[i+2] = 0;
+		}
+	}
+	return *this;
+}
+
+Histogram Image::treshold(int treshVal)
+{
+	Histogram H_data;
+	for (int i = 0; i < width * height * channels; i++) {
+		if (data[i] < treshVal) {
+			H_data.histogram_data[0] += 1;
+		}
+		else {
+			H_data.histogram_data[1] += 1;
+		}
+	}
+	return H_data;
 }
 
 Image& Image::invert()
@@ -236,6 +236,12 @@ Image& Image::invert()
 		data[i + 2] = maxVal - data[i + 2];
 	}
 	return *this;
+}
+
+
+Image& Image::transform()
+{
+	// TODO: insert return statement here
 }
 
 
@@ -262,9 +268,7 @@ Image& Image::boxFilterTxT()
 		filterData[u + 1] = avgGreen;
 		filterData[u + 2] = avgBlue;
 	}
-	/*for (int i = 0; i < width * height * channels; i++) {
-		memset(data + i, (int)filterData + i, 1);
-	}*/
+
 	data = filterData;
 	return *this;
 }
@@ -299,7 +303,6 @@ Image& Image::filterChannel(float r, float g, float b)
 	return *this;
 }
 
-/*pridat autocontrast moznost*/
 
 //useful functions
 
@@ -312,6 +315,17 @@ int find_min(int arr[], int sz) {
 	}
 	return min;
 }
+
+int find_min(uint8_t arr[], int sz,int channels) {
+	int min = 256;
+	for (int i = 0; i < sz; i+=channels) {
+		if (arr[i] < min) {
+			min = arr[i];
+		}
+	}
+	return min;
+}
+
 int find_max(int arr[], int sz) {
 	int max = 0;
 	for (int i = 0; i < sz; i++) {

@@ -1,21 +1,9 @@
-#include <cstdio>
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <fstream>
-#include <string>
+// DECLARATION HEADER
 
-#include <linux/ioctl.h>
-#include <linux/types.h>
-#include <linux/v4l2-common.h>
-#include <linux/v4l2-controls.h>
-#include <linux/videodev2.h>
-
-#include <sys/ioctl.h>
-#include <fcntl.h>
-#include <unistd.h>
-
-int check();
-int setRF(int cameraDescriptor);
-int setBuffer(int cameraDescriptor);
-int makeFrame(int cameraDescriptor);
+int camera_check(int cd);						//checks whether camera device is connected
+uint8_t* camera_record_init(int cd);			//calls tools for setting resolutions, buffers, and capturing frame
+int capability(int cd);					//retrieves device capability
+int set_r_f(int cd); 					//set resolution and format of recorded picture
+int set_buffer(int cd);					//requesting, setting and mapping buffer 
+int make_frame(int cd);					//capturing the frame
+int stop_stream(int cd);				//closes stream from device
