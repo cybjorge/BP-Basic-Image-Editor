@@ -6,6 +6,13 @@
 #include "Image.h"
 #include "cameraControls.h"
 
+
+#include <linux/ioctl.h>
+#include <linux/types.h>
+#include <linux/v4l2-common.h>
+#include <linux/v4l2-controls.h>
+#include <linux/videodev2.h>
+
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <fcntl.h>
@@ -18,10 +25,11 @@ int main(int argc, char* argv[])
 
     int camera = open("/dev/video0", O_RDWR);
     if (camera_check(camera) != -1) {
-        Image buftest(camera_record_init(camera));
-        Image test("/home/pi/projects/bcappv1/bin/x86/Debug/camerasnak.jpg");
-
-        int done=buftest.write("testfrombuffer.jpg");
+        Image buftest(camera_record_init(camera)); ///ulozi sa priamo z fotenia
+        Image test("/home/pi/projects/bcappv1/bin/x86/Debug/camerasnap.png");
+        test.write("openedtest.png");//ulozi sa fotka otvorena z disku
+       // buftest.filterChannel(1, 0, 0);
+        int done=buftest.write("testfrombuffer2.png"); //ulozi sa fotka buffera
         cout << done;
     };
     

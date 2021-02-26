@@ -1,18 +1,25 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #define STBI_FAILURE_USERMSG
-
+#define MAX_BUFF_LEN 1270*720*3
 
 #include "Image.h"
 #include "stb_image.h"
 #include "stb_image_write.h"
 #include <algorithm>
 
+#include <sys/ioctl.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+
 //declarations for functions needed to perform some operations
 int find_min(int arr[],int sz);
 int find_min(uint8_t arr[], int sz,int channels);
 int find_max(int arr[],int sz);
 int clamp(int channelValue);
+int size_from_buffer(uint8_t* buffer);
 int sort();
 uint8_t to2darray(uint8_t unsortedData);
 
@@ -31,12 +38,18 @@ Image::Image(const char* filename)
 }
 
 Image::Image(uint8_t* buffer) {
-	this->data = buffer;
+	/*data = buffer;
 	width = 1280;
 	height = 720;
-	channels = 3;
-	size = width * height * channels;
-	type = JPG;
+	channels = 3; 
+	size = size_from_buffer(buffer);
+	type = BMP;*/
+	if (read(buffer)) {
+		size =;
+		from_buffer = true;
+	}
+
+	
 	
 }
 
@@ -63,16 +76,24 @@ bool Image::read(const char* filename)
 	return data != NULL;
 }
 
-//bool Image::read(uint8_t* buffer)
-//{
-//	data = stbi_load_from_memory(buffer, bufsize,&width, &height, &channels, 0);
-//	return data != NULL;
-//}
+bool Image::read(uint8_t* buffer)
+{
+	data = stbi_load_from_memory(buffer, MAX_BUFF_LEN,&width, &height, &channels, 0);
+	return data != NULL;
+}
 
 bool Image::write(const char* filename)
 {
-	ImageType type = imageFileType(filename);
 	int done;
+	ImageType type = imageFileType(filename);
+	if (from_buffer) {
+		mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+		int output = open(filename, O_RDWR | O_CREAT | O_TRUNC, mode);
+		::write(output, data, size);
+		close(output);
+		return done != 0;
+	}
+	
 	switch (type)
 	{
 	case PNG:
@@ -346,3 +367,10 @@ int clamp(int channelValue) {
 	return channelValue;
 }
 
+int size_from_buffer(uint8_t* buffer) {
+	int i = 0;
+	while (buffer[i] != NULL) {
+		i++;
+	}
+	return i;
+}

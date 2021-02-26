@@ -28,10 +28,12 @@ struct Image{
 	uint8_t* data = NULL;
 	size_t size = 0;
 	ImageType type;
+
 	int width;
 	int height;
 	int channels;
 
+	bool from_buffer = false;
 
 	Image(const char* filename);
 	Image(uint8_t* buffer);

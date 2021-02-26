@@ -16,12 +16,17 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "cameraControls.h"
 
 using namespace std;
 uint8_t* buf;
-int buflen;
+
+struct image_buf {
+	uint8_t* bufer;
+	int buflen;
+};
 
 int camera_check(int cd)
 {	
@@ -40,6 +45,7 @@ int camera_check(int cd)
 	return cd;
 }
 uint8_t* camera_record_init(int cd) {
+	image_buf b;
 	if (capability(cd) < 0) {
 		cout << "unable to retrieve device capability";
 		return nullptr;
@@ -48,7 +54,7 @@ uint8_t* camera_record_init(int cd) {
 		cout << "unable to set resolution";
 		return nullptr;
 	}
-	if (set_buffer(cd) < 0) {
+	if (b.buflen=set_buffer(cd) < 0) {
 		cout << "buffer not set";
 		return nullptr;
 	}
@@ -61,6 +67,8 @@ uint8_t* camera_record_init(int cd) {
 		return nullptr;
 	}
 	close(cd);
+
+	b.bufer = buf;
 	return buf;
 }
 
@@ -78,7 +86,7 @@ int set_r_f(int cd) {
 	imageRF.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	imageRF.fmt.pix.width = 1280;
 	imageRF.fmt.pix.height = 720;
-	imageRF.fmt.pix.pixelformat = V4L2_PIX_FMT_JPEG;
+	imageRF.fmt.pix.pixelformat = V4L2_PIX_FMT_MJPEG;
 	imageRF.fmt.pix.field = V4L2_FIELD_NONE;
 
 	if (ioctl(cd, VIDIOC_S_FMT, &imageRF) < 0) {
@@ -115,8 +123,7 @@ int set_buffer(int cd)
 	}
 	buf = (uint8_t*) mmap(NULL, querryBuffer.length, PROT_READ | PROT_WRITE, MAP_SHARED, cd, querryBuffer.m.offset);
 	memset(buf, 0, querryBuffer.length);
-	//buflen = querryBuffer.length;
-	return 0;
+	return querryBuffer.length;
 }
 
 int make_frame(int cd)
@@ -146,11 +153,10 @@ int make_frame(int cd)
 		perror("VIDIOC_DQBUF");
 		return -1;
 	}
-
-	int output = open("camerasnap.jpg", O_RDWR | O_CREAT);
+	mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+	int output = open("camerasnap.png", O_RDWR | O_CREAT | O_TRUNC,mode);
 	write(output,buf,frameBuffer.bytesused);
 	close(output);
-	cout << "image saved";
 
 
 	return 0;
@@ -163,4 +169,7 @@ int stop_stream(int cd) {
 		return -1;
 	}
 
+}
+int buf_size() {
+	return buflen;
 }
