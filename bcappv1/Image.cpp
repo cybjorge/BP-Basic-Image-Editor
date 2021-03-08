@@ -38,16 +38,16 @@ Image::Image(const char* filename)
 }
 
 Image::Image(uint8_t* buffer) {
-	/*data = buffer;
+	data = buffer;
 	width = 1280;
 	height = 720;
 	channels = 3; 
 	size = size_from_buffer(buffer);
-	type = BMP;*/
-	if (read(buffer)) {
+	type = BMP;
+	/*if (read(buffer)) {
 		size =;
 		from_buffer = true;
-	}
+	}*/
 
 	
 	

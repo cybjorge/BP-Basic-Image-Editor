@@ -58,9 +58,11 @@ uint8_t* camera_record_init(int cd) {
 		cout << "buffer not set";
 		return nullptr;
 	}
-	if (make_frame(cd) < 0) {
-		cout << "unable to capture frame";
-		return nullptr;
+	for (int i = 0; i < 5; i++) {
+		if (make_frame(cd, i) < 0) {
+			cout << "unable to capture frame";
+			return nullptr;
+		}
 	}
 	if (stop_stream(cd) < 0) {
 		cout << "unable to stop stream";
@@ -126,7 +128,7 @@ int set_buffer(int cd)
 	return querryBuffer.length;
 }
 
-int make_frame(int cd)
+int make_frame(int cd,int loop)
 {
 	v4l2_buffer frameBuffer = { 0 };
 	frameBuffer.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -141,6 +143,7 @@ int make_frame(int cd)
 		perror("VIDIOC_STREAMON");
 		return -1;
 	}
+
 	fd_set fd;
 	FD_ZERO(&fd);
 	FD_SET(cd, &fd);
@@ -154,7 +157,10 @@ int make_frame(int cd)
 		return -1;
 	}
 	mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-	int output = open("camerasnap.png", O_RDWR | O_CREAT | O_TRUNC,mode);
+	string name = "camerasnap";
+	string numname = name+to_string(loop)+".png";
+	const char* n = numname.c_str();
+	int output = open(n, O_RDWR | O_CREAT | O_TRUNC,mode);
 	write(output,buf,frameBuffer.bytesused);
 	close(output);
 
@@ -169,7 +175,4 @@ int stop_stream(int cd) {
 		return -1;
 	}
 
-}
-int buf_size() {
-	return buflen;
 }
