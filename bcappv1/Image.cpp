@@ -6,6 +6,7 @@
 #include "Image.h"
 #include "stb_image.h"
 #include "stb_image_write.h"
+#include "cameraControls.h"
 #include <algorithm>
 
 #include <sys/ioctl.h>
@@ -19,7 +20,6 @@ int find_min(int arr[],int sz);
 int find_min(uint8_t arr[], int sz,int channels);
 int find_max(int arr[],int sz);
 int clamp(int channelValue);
-int size_from_buffer(uint8_t* buffer);
 int sort();
 uint8_t to2darray(uint8_t unsortedData);
 
@@ -37,20 +37,14 @@ Image::Image(const char* filename)
 	}
 }
 
-Image::Image(uint8_t* buffer) {
+Image::Image(uint8_t* buffer,size_t buflen) {
 	data = buffer;
 	width = 1280;
 	height = 720;
 	channels = 3; 
-	size = size_from_buffer(buffer);
-	type = BMP;
-	/*if (read(buffer)) {
-		size =;
-		from_buffer = true;
-	}*/
-
-	
-	
+	size =	buflen;
+	type = JPG;
+	from_buffer = true;
 }
 
 Image::Image(int width, int height, int channels) : width(width),height(height),channels(channels)
@@ -66,7 +60,11 @@ Image::Image(const Image& img) : Image(img.width,img.height,img.channels)
 
 Image::~Image()
 {
-	stbi_image_free(data);
+	if (from_buffer) {
+	}
+	else {
+		stbi_image_free(data);
+	}
 }
 
 
@@ -155,6 +153,27 @@ Histogram Image::histogram(int desired_channel) {
 	return H_data;
 }
 
+Histogram Image::cumulative_histogram(int desired_channel,Histogram h) {
+
+	int step;
+
+	if (!desired_channel) {
+		desired_channel = 1;
+		step = 1;
+	}
+	else {
+		step = channels;
+	}
+
+	for (int i = desired_channel - 1; i < size; i += step) {
+		h.histogram_data[data[i]]++;
+	}
+
+	return h;
+}
+
+
+
 void Image::stats(const char* filename)
 {
 	printf("Image width x image heigth: %d  x %d \n", width, height);
@@ -178,11 +197,16 @@ Histogram::Histogram()
 //point operations
 Image& Image::grayscale()
 {
+	
 	if (channels < 3) {
 		printf("Sorry, but it seems that image has less than 3 (RGB) channels");
 	}
 	else {
-		for (int i = 0; i < size; i += channels) {
+		int i = 0;
+		if (from_buffer) {
+			i = 17;
+		}
+		for (i; i < size; i += channels) {
 			int grayscale = (data[i] + data[i + 1] + data[i + 2]) / 3;
 			memset(data + i, grayscale, 3);//if there are 4 channels, make channels-1
 		}
@@ -367,10 +391,15 @@ int clamp(int channelValue) {
 	return channelValue;
 }
 
-int size_from_buffer(uint8_t* buffer) {
+size_t Image::size_from_buffer(uint8_t* buffer) {
 	int i = 0;
-	while (buffer[i] != NULL) {
-		i++;
+
+	for (i; i < width * height * channels; i++) {
+		if (buffer[i]*1) {}
+		else
+		{
+			return i;
+		}
 	}
-	return i;
+
 }

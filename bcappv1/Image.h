@@ -21,7 +21,6 @@ struct Histogram
 	median
 	*/
 	Histogram();
-	//~Histogram();
 };
 
 struct Image{
@@ -36,7 +35,7 @@ struct Image{
 	bool from_buffer = false;
 
 	Image(const char* filename);
-	Image(uint8_t* buffer);
+	Image(uint8_t* buffer,size_t buflen);
 	Image(int width, int height, int channels);
 	Image(const Image& img);
 	~Image();
@@ -46,6 +45,7 @@ struct Image{
 	//histogram
 	Histogram histogram();
 	Histogram histogram(int desired_channel);
+	Histogram cumulative_histogram(int desired_channel, Histogram h);
 	Histogram treshold(int treshVal);
 	
 	bool read(const char* filename);
@@ -63,6 +63,8 @@ struct Image{
 	Image& boost_color(char channel);
 	//pixel
 
+	//tools
+	size_t size_from_buffer(uint8_t* buffer);
 
 	//filter declarations
 	Image& boxFilterTxT();

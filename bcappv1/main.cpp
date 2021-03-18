@@ -18,46 +18,52 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+
+#include <chrono>
+
 using namespace std;
 
 int main(int argc, char* argv[])
 {
-
+    //calibration
     int camera = open("/dev/video0", O_RDWR);
-    if (camera_check(camera) != -1) {
-        Image buftest(camera_record_init(camera)); ///ulozi sa priamo z fotenia
-        Image test("/home/pi/projects/bcappv1/bin/x86/Debug/camerasnap.png");
-        test.write("openedtest.png");//ulozi sa fotka otvorena z disku
-       // buftest.filterChannel(1, 0, 0);
-        int done=buftest.write("testfrombuffer2.png"); //ulozi sa fotka buffera
-        cout << done;
-    };
-    
+    cout << "Starting calibration \n";
+    auto start = chrono::high_resolution_clock::now();
+    if (camera_check(camera) != -1) {       //if camera is conected, proceed
+        Histogram cumulative_histogram;
+        uint8_t* image;
+        size_t image_size;
 
+        //check camera capability, request buffer
+        capability(camera);
+        set_r_f(camera);
+        set_buffer(camera);
+        //recording loop, do 30 frames, save every 6th
+        for (int i = 1; i <= 30; i++) {                 //camerasnap
+            if (make_frame(camera, i) == 1) {
+            };
+            
+        }
+        cout << "Frames loaded\n";
+        stop_stream(camera);
+        cout << "Computing cumulative histogram \n";
+        for (int i = 6; i <= 30; i += 6) {
+            string path = "/home/pi/projects/bcappv1/bin/x86/Debug/";
+            string name = "camerasnap";
+            string numname = path+name + to_string(i) + ".jpg";
+            const char* fullname = numname.c_str();
+            Image calibration(fullname);
+            calibration.grayscale();
+            cumulative_histogram = calibration.cumulative_histogram(0, cumulative_histogram);
+        }
+        auto finish = chrono::high_resolution_clock::now();
+        chrono::duration<double> elapsed = finish - start;
 
+        cout << "Calibration is done. Total time elapsed: "<<elapsed.count()<<" seconds \n";
+        //histogram operaitons
+        
+    }
 
-   
-    
-
-    ////cout<<pixel(test, 0, 1);
-
-    //
-    //test.filterChannel(1, 0, 0);
-    //
-    //test.adjustContrast(1.1);
-    //test.adjustBrightness(75);
-    //
-    ////test.invert();
-    ////test.boost_color('r');
-    //test.write("image-pc-test.jpg");
-
-
-    //Image gray=test;
-    //Image filter = test;
-    //Image contrast = test;
-    //Image brightness = test;
-    //Image inver = test;
-    //Image boxF = test;
 
 
     cout << "BCappV1 has finished! \n";
