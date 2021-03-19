@@ -47,32 +47,32 @@ int camera_check(int cd)
 	}
 	return cd;
 }
-uint8_t* camera_record_init(int cd,int flag) {
-	if (capability(cd) < 0) {
-		cout << "unable to retrieve device capability";
-		return nullptr;
-	}
-	if (set_r_f(cd) < 0) {
-		cout << "unable to set resolution";
-		return nullptr;
-	}
-	if (set_buffer(cd) < 0) { ///buflen
-		cout << "buffer not set";
-		return nullptr;
-	}
-	for (int i = 0; i < 5; i++) {
-		if (make_frame(cd, i) < 0) {
-			cout << "unable to capture frame";
-			return nullptr;
-		}
-	}
-	if (stop_stream(cd) < 0) {
-		cout << "unable to stop stream";
-		return nullptr;
-	}
-	close(cd);
-	return buf;
-}
+//uint8_t* camera_record_init(int cd,int flag) {
+//	if (capability(cd) < 0) {
+//		cout << "unable to retrieve device capability";
+//		return nullptr;
+//	}
+//	if (set_r_f(cd) < 0) {
+//		cout << "unable to set resolution";
+//		return nullptr;
+//	}
+//	if (set_buffer(cd) < 0) { ///buflen
+//		cout << "buffer not set";
+//		return nullptr;
+//	}
+//	for (int i = 0; i < 5; i++) {
+//		if (make_frame(cd, i) < 0) {
+//			cout << "unable to capture frame";
+//			return nullptr;
+//		}
+//	}
+//	if (stop_stream(cd) < 0) {
+//		cout << "unable to stop stream";
+//		return nullptr;
+//	}
+//	close(cd);
+//	return buf;
+//}
 
 int capability(int cd) {
 	v4l2_capability capability;
@@ -129,7 +129,7 @@ int set_buffer(int cd)
 	return buflen;
 }
 
-int make_frame(int cd,int loop)
+int make_frame(int cd,int loop,int flag)
 {
 	v4l2_buffer frameBuffer = { 0 };
 	frameBuffer.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -157,9 +157,17 @@ int make_frame(int cd,int loop)
 		perror("VIDIOC_DQBUF");
 		return -1;
 	}
+
+	else
 	if (loop % 6 == 0) {
+
 		mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-		string name = "camerasnap";
+		string name = "";
+		
+		if (flag == CALIBRATION) { name = "camerasnap"; }
+		if (flag == MAIN) { name = "capture"; }
+		if (flag == TEST) { name = "test"; }
+		
 		string numname = name + to_string(loop) + ".jpg";
 		const char* n = numname.c_str();
 		int output = open(n, O_RDWR | O_CREAT | O_TRUNC, mode);

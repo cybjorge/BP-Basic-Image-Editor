@@ -12,14 +12,15 @@ enum ImageType {
 struct Histogram
 {
 	int histogram_data[HIST_ARRAY_SIZE];
+	
 	int mean;
 	int median;
+	int max;
 
-	/* auto compute
-	mean
-	variance
-	median
-	*/
+	float diffs(Histogram a, Histogram b);
+	Histogram& average_value();
+	Histogram& statistics();
+	Histogram equalisation_parameters();
 	Histogram();
 };
 
@@ -46,7 +47,8 @@ struct Image{
 	Histogram histogram();
 	Histogram histogram(int desired_channel);
 	Histogram cumulative_histogram(int desired_channel, Histogram h);
-	Histogram treshold(int treshVal);
+	Histogram treshold();
+	
 	
 	bool read(const char* filename);
 	bool read(uint8_t* buffer);
@@ -57,6 +59,7 @@ struct Image{
 	Image& grayscale ();
 	Image& filterChannel(float r, float g, float b);
 	Image& adjustContrast(float value);
+	Image& brightness_by_treshold(int treshold);
 	Image& adjustBrightness(float value);
 	Image& invert();
 	Image& transform();
@@ -70,4 +73,6 @@ struct Image{
 	Image& boxFilterTxT();
 
 };
+float mid_range_tresh_value(Histogram c);
+
 //uint8_t* pixel(Image img, int x, int y);
