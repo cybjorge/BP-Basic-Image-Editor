@@ -461,6 +461,23 @@ size_t Image::size_from_buffer(uint8_t* buffer) {
 
 }
 
+Image& Image::histogram_equalisation(Histogram h)
+{
+	int new_values[256] = { 0 };
+	int cumulative_frequency = 0;
+	
+	for (int i = 0; i < 256; i++) {
+		cumulative_frequency += h.histogram_data[i];
+		new_values[i] = cumulative_frequency * 255 / (width * height);
+	}
+
+	for (int j = 0; j < size; j++) {
+		data[j] = new_values[j];
+	}
+
+	return *this;
+}
+
 
 //Histogram own methods
 Histogram& Histogram::average_value() {

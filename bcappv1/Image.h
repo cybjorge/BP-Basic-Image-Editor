@@ -65,7 +65,8 @@ struct Image{
 	Image& transform();
 	Image& boost_color(char channel);
 	//pixel
-
+	//histogram operation
+	Image& histogram_equalisation(Histogram h);
 	//tools
 	size_t size_from_buffer(uint8_t* buffer);
 
