@@ -25,7 +25,7 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-    /*
+    
     Image test("/home/pi/projects/bcappv1/mj.jpg");
     Histogram h;
     test.grayscale();
@@ -33,7 +33,8 @@ int main(int argc, char* argv[])
     h = test.histogram();
     test.histogram_equalisation(h);
     test.write("equalisation.jpg");
-    */
+    test.boxFilterTxT();
+    test.write("boxfiltertest.jpg");
 
 
 

@@ -8,6 +8,7 @@
 #include "stb_image_write.h"
 #include "cameraControls.h"
 #include <algorithm>
+#include <bits/stdc++.h>
 
 #include <sys/ioctl.h>
 #include <sys/mman.h>
@@ -24,7 +25,6 @@ int find_max_at(int arr[], int sz);
 int find_min_at(int arr[], int sz);
 
 int clamp(int channelValue);
-int sort();
 uint8_t to2darray(uint8_t unsortedData);
 
 Image::Image(const char* filename)
@@ -302,7 +302,8 @@ Image& Image::transform()
 
 Image& Image::boxFilterTxT()
 {
-	int m = width;
+	/*
+	* 	int m = width;
 	int n = height;
 	uint8_t* filterData = data;
 
@@ -325,6 +326,43 @@ Image& Image::boxFilterTxT()
 
 	data = filterData;
 	return *this;
+	*/
+	uint8_t* stored_data;
+	memset(stored_data, 0, size);
+	//rows = height
+	//colums/pixels = width*channels
+	int row_len = width * channels;
+	int row_offset = 0;
+	int window[9] = {0};
+	for (int i = 0; i < height; i++) {
+		if (i == 0 || i == height - 1) {
+			continue;
+		}
+		else {
+			row_offset = i * row_len;
+			for (int j = 0; j < row_len; j+=channels) {
+				//top row
+				window[0] = data[row_offset - row_len];
+				window[1] = data[row_offset - row_len + channels];
+				window[2] = data[row_offset - row_len + 2*channels];
+				//middle row
+				window[3] = data[row_offset];
+				window[4] = data[row_offset+channels];
+				window[5] = data[row_offset+2*channels];
+				//bottom row
+				window[6] = data[row_offset + row_len];
+				window[7] = data[row_offset + row_len + channels];
+				window[8] = data[row_offset + row_len + 2 * channels];
+				//sort the array
+				std::sort(window[0], 9);
+				//add the median value to stored_data
+				memset(stored_data + row_offset, window[4], 3);
+				//increment the offset by channels, in this case, by 3
+				row_offset += channels;
+			}
+		}
+	}
+	memcpy(data, stored_data, size);
 }
 
 Image& Image::adjustBrightness(float value)
