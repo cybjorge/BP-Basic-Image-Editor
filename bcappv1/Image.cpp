@@ -23,7 +23,9 @@ int find_max(int arr[],int sz);
 
 int find_max_at(int arr[], int sz);
 int find_min_at(int arr[], int sz);
-
+//sorting
+void swap_sort(int* x, int* y);
+void bubble_sort(int array[], int array_size);
 int clamp(int channelValue);
 uint8_t to2darray(uint8_t unsortedData);
 
@@ -302,59 +304,36 @@ Image& Image::transform()
 
 Image& Image::boxFilterTxT()
 {
-	/*
-	* 	int m = width;
-	int n = height;
-	uint8_t* filterData = data;
 
-	
-	//next row offset is width
-	//start at +1 pixel == start with value 3 (representing pixel) and at 2nd row
-	for (int u = channels+width; u < size-(channels*width); u += channels) {
-		int downOffset = (u - width);
-		if (downOffset < 0) {
-			downOffset *= -1;
-		}
-		int upOffset = (u + width);
-		int avgRed = (data[downOffset - 3] + data[downOffset] + data[downOffset + 3] + data[u - 3] + data[u] + data[u + 3] + data[upOffset - 3] + data[upOffset] + data[upOffset + 3]) / 9;
-		int avgGreen = (data[downOffset - 2] + data[downOffset + 1] + data[downOffset + 4] + data[u - 2] + data[u + 1] + data[u + 4] + data[upOffset - 2] + data[upOffset + 1] + data[upOffset + 4]) / 9;
-		int avgBlue = (data[downOffset - 1] + data[downOffset + 2] + data[downOffset + 5] + data[u - 1] + data[u + 2] + data[u + 5] + data[upOffset - 1] + data[upOffset + 2] + data[upOffset + 5]) / 9;
-		filterData[u] = avgRed;
-		filterData[u + 1] = avgGreen;
-		filterData[u + 2] = avgBlue;
-	}
-
-	data = filterData;
-	return *this;
-	*/
 	uint8_t* stored_data;
-	memset(stored_data, 0, size);
+	stored_data =data;
+	//memset(stored_data, 0, size);
 	//rows = height
 	//colums/pixels = width*channels
 	int row_len = width * channels;
 	int row_offset = 0;
-	int window[9] = {0};
+	int window[9] = { 0 };
 	for (int i = 0; i < height; i++) {
 		if (i == 0 || i == height - 1) {
 			continue;
 		}
 		else {
 			row_offset = i * row_len;
-			for (int j = 0; j < row_len; j+=channels) {
+			for (int j = 0; j < row_len; j += channels) {
 				//top row
 				window[0] = data[row_offset - row_len];
 				window[1] = data[row_offset - row_len + channels];
-				window[2] = data[row_offset - row_len + 2*channels];
+				window[2] = data[row_offset - row_len + 2 * channels];
 				//middle row
 				window[3] = data[row_offset];
-				window[4] = data[row_offset+channels];
-				window[5] = data[row_offset+2*channels];
+				window[4] = data[row_offset + channels];
+				window[5] = data[row_offset + 2 * channels];
 				//bottom row
 				window[6] = data[row_offset + row_len];
 				window[7] = data[row_offset + row_len + channels];
 				window[8] = data[row_offset + row_len + 2 * channels];
 				//sort the array
-				std::sort(window[0], 9);
+				bubble_sort(window, 9);
 				//add the median value to stored_data
 				memset(stored_data + row_offset, window[4], 3);
 				//increment the offset by channels, in this case, by 3
@@ -363,6 +342,7 @@ Image& Image::boxFilterTxT()
 		}
 	}
 	memcpy(data, stored_data, size);
+	return *this;
 }
 
 Image& Image::adjustBrightness(float value)
@@ -555,3 +535,17 @@ float mid_range_tresh_value(Histogram c)
 	return (find_max_at(c.histogram_data,256)- find_min_at(c.histogram_data, 256))/2;
 }
 
+void swap_sort(int* x, int* y) {
+	int tmp = *x;
+	*x = *y;
+	*y = tmp;
+}
+void bubble_sort(int array[], int array_size) {
+	for (int i = 0; i < array_size - 1; i++) {
+		for (int j = 0; j < (array_size - i - 1); j++) {
+			if (array[j] > array[j + 1]) {
+				swap_sort(&array[j], &array[j + 1]);
+			}
+		}
+	}
+}

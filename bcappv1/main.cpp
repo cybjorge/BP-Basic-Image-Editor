@@ -26,18 +26,17 @@ using namespace std;
 int main(int argc, char* argv[])
 {
     
-    Image test("/home/pi/projects/bcappv1/mj.jpg");
+    Image test("/home/pi/projects/bcappv1/example.jpg");
     Histogram h;
     test.grayscale();
     test.write("GS.jpg");
     h = test.histogram();
-    test.histogram_equalisation(h);
-    test.write("equalisation.jpg");
+
     test.boxFilterTxT();
     test.write("boxfiltertest.jpg");
 
-
-
+    test.histogram_equalisation(h);
+    test.write("equalisation.jpg");
     
     cout << "BCappV1 has finished! \n";
     return 0;
