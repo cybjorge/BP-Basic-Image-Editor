@@ -508,13 +508,25 @@ Histogram& Histogram::average_value() {
 }
 
 Histogram& Histogram::statistics() { 
+	
 	for (int i = 0; i < 256; i++) {
 		mean += histogram_data[i];
 		median += histogram_data[i];
 	}
-	mean = mean / 255;
+	mean = mean / 256;
 
 	//median
+	if (median % 2 == 0) {
+		for (int i = 0; i < 256; i++) {
+			if (histogram_data[i] == median) {
+				median = histogram_data[i];			
+			}
+		}
+	}
+	else {
+		int m1 = median - 1;
+		int m2 = median + 1;
+	}
 	return *this;
 }
 Histogram Histogram::equalisation_parameters()
