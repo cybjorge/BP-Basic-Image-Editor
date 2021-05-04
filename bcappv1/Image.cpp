@@ -162,8 +162,8 @@ Histogram Image::histogram(int desired_channel) {
 }
 
 Histogram Image::cumulative_histogram(int desired_channel,Histogram h) {
-
-	int step;
+	/*
+	* 	int step;
 
 	if (!desired_channel) {
 		desired_channel = 1;
@@ -172,9 +172,12 @@ Histogram Image::cumulative_histogram(int desired_channel,Histogram h) {
 	else {
 		step = channels;
 	}
-
-	for (int i = desired_channel - 1; i < size; i += step) {
-		h.histogram_data[data[i]]++;
+	*/
+	int sum = 0;
+	for (int i = 0; i < size; i += channels) {
+		sum += h.histogram_data[i];
+		h.cumulative_histogram_data[i] = sum;
+//		h.histogram_data[data[i]]++;
 	}
 
 	return h;

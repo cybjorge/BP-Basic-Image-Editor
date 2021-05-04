@@ -12,7 +12,7 @@ enum ImageType {
 struct Histogram
 {
 	int histogram_data[HIST_ARRAY_SIZE];
-	
+	int cumulative_histogram_data[HIST_ARRAY_SIZE];
 	int mean;
 	int median;
 	int max;
