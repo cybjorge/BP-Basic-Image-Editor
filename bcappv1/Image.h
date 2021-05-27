@@ -46,7 +46,7 @@ struct Image{
 	//histogram
 	Histogram histogram();
 	Histogram histogram(int desired_channel);
-	Histogram cumulative_histogram(int desired_channel, Histogram h);
+	Histogram cumulative_histogram(Histogram h);
 	Histogram treshold();
 	
 	

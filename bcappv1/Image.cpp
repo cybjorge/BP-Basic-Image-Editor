@@ -161,7 +161,7 @@ Histogram Image::histogram(int desired_channel) {
 	return H_data;
 }
 
-Histogram Image::cumulative_histogram(int desired_channel,Histogram h) {
+Histogram Image::cumulative_histogram(Histogram h) {
 	/*
 	* 	int step;
 
