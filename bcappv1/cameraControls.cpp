@@ -159,24 +159,26 @@ int make_frame(int cd,int loop,int flag)
 	}
 
 	else
-	if (loop % 6 == 0) {
+		if (flag == CALIBRATION){}
+		else {
+			if (loop % 6 == 0) {
 
-		mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-		string name = "";
-		
-		if (flag == CALIBRATION) { name = "camerasnap"; }
-		if (flag == MAIN) { name = "capture"; }
-		if (flag == TEST) { name = "test"; }
-		
-		string numname = name + to_string(loop) + ".jpg";
-		const char* n = numname.c_str();
-		int output = open(n, O_RDWR | O_CREAT | O_TRUNC, mode);
-		write(output, buf, frameBuffer.bytesused);
-		close(output);
-		buflen = frameBuffer.bytesused;
-		return 1;
-	}
+				mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+				string name = "";
 
+				if (flag == CALIBRATION) { name = "camerasnap"; }
+				if (flag == MAIN) { name = "capture"; }
+				if (flag == TEST) { name = "test"; }
+
+				string numname = name + to_string(loop) + ".jpg";
+				const char* n = numname.c_str();
+				int output = open(n, O_RDWR | O_CREAT | O_TRUNC, mode);
+				write(output, buf, frameBuffer.bytesused);
+				close(output);
+				return 1;
+			}
+		}
+	buflen = frameBuffer.bytesused;
 	return 0;
 }
 int stop_stream(int cd) {

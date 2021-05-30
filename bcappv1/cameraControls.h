@@ -2,7 +2,7 @@
 #define CALIBRATION 1
 #define MAIN 2
 #define TEST 3
-
+#define CALIBRATION_REPEAT 250
 int camera_check(int cd);						//checks whether camera device is connected
 uint8_t* camera_record_init(int cd,int flag);			//calls tools for setting resolutions, buffers, and capturing frame
 int capability(int cd);					//retrieves device capability

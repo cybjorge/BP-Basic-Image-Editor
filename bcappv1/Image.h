@@ -51,7 +51,7 @@ struct Image{
 	
 	
 	bool read(const char* filename);
-	bool read(uint8_t* buffer);
+	bool read(uint8_t* buffer,size_t bufflen);
 	bool write(const char* filename);
 
 	ImageType imageFileType(const char* filename);

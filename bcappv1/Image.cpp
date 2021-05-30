@@ -44,13 +44,17 @@ Image::Image(const char* filename)
 }
 
 Image::Image(uint8_t* buffer,size_t buflen) {
-	data = buffer;
-	width = 1280;
-	height = 720;
-	channels = 3; 
-	size =	buflen;
-	type = JPG;
-	from_buffer = true;
+	//data = buffer;
+	//width = 1280;
+	//height = 720;
+	//channels = 3; 
+	//size =	buflen;
+	//type = JPG;
+	//from_buffer = true;
+	if (read(buffer, buflen)) {
+		printf("shits buzzin");
+		size = width * height * channels;
+	}
 }
 
 Image::Image(int width, int height, int channels) : width(width),height(height),channels(channels)
@@ -80,9 +84,9 @@ bool Image::read(const char* filename)
 	return data != NULL;
 }
 
-bool Image::read(uint8_t* buffer)
+bool Image::read(uint8_t* buffer,size_t bufflen)
 {
-	data = stbi_load_from_memory(buffer, MAX_BUFF_LEN,&width, &height, &channels, 0);
+	data = stbi_load_from_memory(buffer, bufflen,&width, &height, &channels, 0);
 	return data != NULL;
 }
 
