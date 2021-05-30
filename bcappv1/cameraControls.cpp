@@ -80,6 +80,7 @@ int capability(int cd) {
 		perror("VIDIOC_QUERYCAP");
 		return -1;
 	}
+	return 0;
 }
 
 int set_r_f(int cd) {
@@ -188,7 +189,7 @@ int stop_stream(int cd) {
 		perror("VIDIOC_STREAMOFF");
 		return -1;
 	}
-
+	return 0;
 }
 uint8_t* return_buf() {
 	return buf;

@@ -13,9 +13,13 @@ struct Histogram
 {
 	int histogram_data[HIST_ARRAY_SIZE];
 	int cumulative_histogram_data[HIST_ARRAY_SIZE];
+	int binary_treshold[2];
 	int mean;
 	int median;
+	int max_index;
+	int min_index;
 	int max;
+	int min;
 
 	float diffs(Histogram a, Histogram b);
 	Histogram& average_value();
@@ -71,7 +75,7 @@ struct Image{
 	size_t size_from_buffer(uint8_t* buffer);
 
 	//filter declarations
-	Image& boxFilterTxT();
+	Image& median_filter();
 
 };
 float mid_range_tresh_value(Histogram c);

@@ -44,16 +44,12 @@ Image::Image(const char* filename)
 }
 
 Image::Image(uint8_t* buffer,size_t buflen) {
-	//data = buffer;
-	//width = 1280;
-	//height = 720;
-	//channels = 3; 
-	//size =	buflen;
-	//type = JPG;
-	//from_buffer = true;
 	if (read(buffer, buflen)) {
-		printf("shits buzzin");
+		printf("Image was loaded from buffer");
 		size = width * height * channels;
+	}
+	else {
+		perror("Not able to read image");
 	}
 }
 
@@ -95,15 +91,7 @@ bool Image::read(uint8_t* buffer,size_t bufflen)
 bool Image::write(const char* filename)
 {
 	int done;
-	ImageType type = imageFileType(filename);
-	if (from_buffer) {
-		mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-		int output = open(filename, O_RDWR | O_CREAT | O_TRUNC, mode);
-		::write(output, data, size);
-		close(output);
-		return done != 0;
-	}
-	
+	ImageType type = imageFileType(filename);	
 	switch (type)
 	{
 	case PNG:
@@ -158,7 +146,7 @@ Histogram Image::histogram(int desired_channel) {
 		step = channels;
 	}
 
-	for (int i = desired_channel-1; i < size; i+=step) {
+	for (int i = desired_channel-1; i < size; i+=channels) {
 		H_data.histogram_data[data[i]]++;
 	}
 
@@ -166,22 +154,11 @@ Histogram Image::histogram(int desired_channel) {
 }
 
 Histogram Image::cumulative_histogram(Histogram h) {
-	/*
-	* 	int step;
 
-	if (!desired_channel) {
-		desired_channel = 1;
-		step = 1;
-	}
-	else {
-		step = channels;
-	}
-	*/
 	int sum = 0;
-	for (int i = 0; i < size; i += channels) {
+	for (int i = 0; i < 256; i++) {
 		sum += h.histogram_data[i];
 		h.cumulative_histogram_data[i] = sum;
-//		h.histogram_data[data[i]]++;
 	}
 
 	return h;
@@ -247,7 +224,7 @@ Image& Image::adjustContrast(float value)
 }
 
 Image& Image::boost_color(char channel) {
-	int min = find_min(data, size,channels);
+	//int min = find_min(data, size);
 	int i;
 	switch (channel)
 	{
@@ -302,21 +279,11 @@ Image& Image::invert()
 }
 
 
-Image& Image::transform()
-{
-	// TODO: insert return statement here
-}
-
-
-
-Image& Image::boxFilterTxT()
+Image& Image::median_filter()
 {
 
 	uint8_t* stored_data;
 	stored_data =data;
-	//memset(stored_data, 0, size);
-	//rows = height
-	//colums/pixels = width*channels
 	int row_len = width * channels;
 	int row_offset = 0;
 	int window[9] = { 0 };
@@ -355,7 +322,7 @@ Image& Image::boxFilterTxT()
 Image& Image::adjustBrightness(float value)
 {
 	if (channels < 3) {
-		printf("Sorry, but it seems that image has less than 3 (RGB) channels");
+		perror("Sorry, but it seems that image has less than 3 (RGB) channels");
 	}
 	else {
 		for (int i = 0; i < size; i += channels) {
@@ -371,7 +338,7 @@ Image& Image::brightness_by_treshold(int treshold)
 	int value;
 
 	if (channels < 3) {
-		printf("Sorry, but it seems that image has less than 3 (RGB) channels");
+		perror("Sorry, but it seems that image has less than 3 (RGB) channels");
 	}
 	else {
 		for (int i = 0; i < size; i += channels) {
@@ -395,7 +362,7 @@ Image& Image::brightness_by_treshold(int treshold)
 Image& Image::filterChannel(float r, float g, float b)
 {
 	if (channels < 3) {
-		printf("Sorry, but it seems that this image doesnt have enough color channels to preform this action");
+		perror("Sorry, but it seems that this image doesnt have enough color channels to preform this action");
 	}
 	else {
 		for (int i = 0; i < size; i += channels) {
@@ -409,35 +376,37 @@ Image& Image::filterChannel(float r, float g, float b)
 
 
 //useful functions
-
-int find_min(int arr[], int sz) {
-	int min = find_max(arr,sz);
-	for (int i = 0; i < sz; i++) {
+int find_min(uint8_t arr[], size_t sz) {
+	int min = 256;
+	int i = 0;
+	for (i; i < sz; i++) {
 		if (arr[i] < min) {
 			min = arr[i];
 		}
 	}
-	return min;
+	return i;
 }
 
-int find_min(uint8_t arr[], int sz,int channels) {
+int find_min(int arr[], int sz) {
 	int min = 256;
-	for (int i = 0; i < sz; i+=channels) {
+	int i = 0;
+	for (i; i < sz; i++) {
 		if (arr[i] < min) {
 			min = arr[i];
 		}
 	}
-	return min;
+	return i;
 }
 
 int find_max(int arr[], int sz) {
 	int max = 0;
-	for (int i = 0; i < sz; i++) {
+	int i = 0;
+	for (i; i < sz; i++) {
 		if (arr[i] > max) {
 			max = arr[i];
 		}
 	}
-	return max;
+	return i;
 }
 
 int find_max_at(int arr[], int sz) {
@@ -473,18 +442,6 @@ int clamp(int channelValue) {
 	return channelValue;
 }
 
-size_t Image::size_from_buffer(uint8_t* buffer) {
-	int i = 0;
-
-	for (i; i < width * height * channels; i++) {
-		if (buffer[i]*1) {}
-		else
-		{
-			return i;
-		}
-	}
-
-}
 
 Image& Image::histogram_equalisation(Histogram h)
 {
@@ -503,34 +460,30 @@ Image& Image::histogram_equalisation(Histogram h)
 }
 
 
-//Histogram own methods
-Histogram& Histogram::average_value() {
-	for (int i = 0; i < 256; i++) {
-		histogram_data[i] = histogram_data[i] / 5;
-	}
-	return *this;
-}
+////Histogram own methods
+//Histogram& Histogram::average_value() {
+//	for (int i = 0; i < 256; i++) {
+//		histogram_data[i] = histogram_data[i] / 5;
+//	}
+//	return *this;
+//}
 
 Histogram& Histogram::statistics() { 
-	
-	for (int i = 0; i < 256; i++) {
+	//median
+	int* median_array = histogram_data;
+	bubble_sort(median_array, HIST_ARRAY_SIZE);
+	median = median_array[127];
+	//mean
+	for (int i = 0; i < HIST_ARRAY_SIZE; i++) {
 		mean += histogram_data[i];
-		median += histogram_data[i];
 	}
 	mean = mean / 256;
-
-	//median
-	if (median % 2 == 0) {
-		for (int i = 0; i < 256; i++) {
-			if (histogram_data[i] == median) {
-				median = histogram_data[i];			
-			}
-		}
-	}
-	else {
-		int m1 = median - 1;
-		int m2 = median + 1;
-	}
+	//max
+	max = histogram_data[find_max(histogram_data, HIST_ARRAY_SIZE)];
+	max_index = find_max(histogram_data, HIST_ARRAY_SIZE);
+	//mix
+	min = histogram_data[find_min(histogram_data, HIST_ARRAY_SIZE)];
+	min_index = find_min(histogram_data, HIST_ARRAY_SIZE);
 	return *this;
 }
 Histogram Histogram::equalisation_parameters()

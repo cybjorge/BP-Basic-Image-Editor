@@ -25,7 +25,8 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-    //open camera
+    cout << "welcome\n";
+    //open camera;
     int camera_fd = open("/dev/video0", O_RDWR);
 
     //prepare camera
@@ -34,12 +35,13 @@ int main(int argc, char* argv[])
     set_buffer(camera_fd);
     
     int i = 0;
-    cout << "calibration";
+    cout << "calibration\n"<<flush;
     //auto focus calibration
     while (i < CALIBRATION_REPEAT) {
         make_frame(camera_fd, i, CALIBRATION);
         i++;
     }
+    cout << "calibration finished\n";
     //calibration ended, caputre 5 images
     for (int capture_number = 0; capture_number < 5; capture_number++) {
         make_frame(camera_fd, i, CALIBRATION);
@@ -49,17 +51,21 @@ int main(int argc, char* argv[])
 
         Image img(buffer, size); //create an instance of the image
         Histogram h;
+        img.write("before.jpg");
+        /* preprocessing operations */
+        img.median_filter();
+        img.grayscale();
+       // img.invert();
+        h = img.histogram();
+        img.adjustContrast(1.5);
+       // img.histogram_equalisation(h);
 
+
+        /*this creates names for output images*/
         string numname = "capture" + to_string(capture_number) + ".jpg";
         const char* n = numname.c_str();
-        img.grayscale();
 
         img.write(n);
-        h = img.histogram();
-        img.histogram_equalisation(h);
-        img.write("brighntess.jpg");
-
-
     }
 
     stop_stream(camera_fd);
