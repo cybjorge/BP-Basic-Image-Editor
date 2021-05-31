@@ -252,19 +252,19 @@ Image& Image::boost_color(char channel) {
 
 
 
-Histogram Image::treshold()
+Histogram Image::treshold(Histogram h)
 {
-	Histogram H_data;
+	
 	int treshVal = mid_range_tresh_value(H_data);
 	for (int i = 0; i < width * height * channels; i++) {
 		if (data[i] < treshVal) {
-			H_data.binary_treshold[0] += 1;
+			h.binary_treshold[0] += 1;
 		}
 		else {
-			H_data.binary_treshold[1] += 1;
+			h.binary_treshold[1] += 1;
 		}
 	}
-	return H_data;
+	return h;
 }
 
 Image& Image::invert()

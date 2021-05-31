@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
             img.grayscale();
             // img.invert();
             h = img.histogram();
-            h = img.treshold();
+            h.binary_treshold = img.treshold();
             if (h.binary_treshold[0] > h.binary_treshold[1]) {
                 img.invert();
             }
