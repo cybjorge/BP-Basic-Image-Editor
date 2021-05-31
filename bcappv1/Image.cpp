@@ -255,7 +255,7 @@ Image& Image::boost_color(char channel) {
 Histogram Image::treshold(Histogram h)
 {
 	
-	int treshVal = mid_range_tresh_value(H_data);
+	int treshVal = mid_range_tresh_value(h);
 	for (int i = 0; i < width * height * channels; i++) {
 		if (data[i] < treshVal) {
 			h.binary_treshold[0] += 1;

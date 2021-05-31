@@ -51,7 +51,7 @@ struct Image{
 	Histogram histogram();
 	Histogram histogram(int desired_channel);
 	Histogram cumulative_histogram(Histogram h);
-	Histogram treshold();
+	Histogram treshold(Histogram h);
 	
 	
 	bool read(const char* filename);
