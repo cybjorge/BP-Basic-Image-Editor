@@ -258,10 +258,10 @@ Histogram Image::treshold()
 	int treshVal = mid_range_tresh_value(H_data);
 	for (int i = 0; i < width * height * channels; i++) {
 		if (data[i] < treshVal) {
-			H_data.histogram_data[0] += 1;
+			H_data.binary_treshold[0] += 1;
 		}
 		else {
-			H_data.histogram_data[1] += 1;
+			H_data.binary_treshold[1] += 1;
 		}
 	}
 	return H_data;
