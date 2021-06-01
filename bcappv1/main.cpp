@@ -92,15 +92,25 @@ int main(int argc, char* argv[])
         stop_stream(camera_fd);
         close(camera_fd);
     }
-    
-    //Image img("/home/pi/projects/bcappv1/img.JPG");
+    //
+    //Image img("/home/pi/projects/bcappv1/a.jpg");
     //Histogram h;
 
     //img.grayscale();
     //h = img.histogram();
     //img.write("grayscaled.jpg");
-    //img.histogram_equalisation(h);
-    //img.write("equalised.jpg");
 
+    //Image inv = img;
+    //Image eq = img;
+    //Image jas = img;
+    //Image c = img;
+    //inv.invert();
+    //inv.write("inverted.jpg");
+    //eq.histogram_equalisation(h);
+    //eq.write("equalised.jpg");
+    //c.adjustContrast(1.3);
+    //c.write("contrast.jpg");
+    //jas.adjustBrightness(10);
+    //jas.write("brigtness.jpg");
     return 0;
 }
