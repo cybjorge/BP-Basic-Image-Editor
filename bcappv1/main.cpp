@@ -51,8 +51,8 @@ int main(int argc, char* argv[])
             uint8_t* buffer = return_buf();
             size_t size = return_buf_size();
 
-           // Image img(buffer, size); //create an instance of the image
-            Image img("/home/pi/projects/bcappv1/a.jpg");
+            Image img(buffer, size); //create an instance of the image
+            //Image img("/home/pi/projects/bcappv1/a.jpg");
             Histogram h;
             
             img.write("cap.jpg");
