@@ -20,11 +20,9 @@ struct Histogram
 	int min_index;
 	int max;
 	int min;
+	int imagesize;
 
-	float diffs(Histogram a, Histogram b);
-	Histogram& average_value();
 	Histogram& statistics();
-	Histogram equalisation_parameters();
 	Histogram();
 };
 
@@ -68,6 +66,8 @@ struct Image{
 	Image& invert();
 	Image& transform();
 	Image& boost_color(char channel);
+	Image& auto_local_brightness(Histogram h);
+	Image& auto_local_contrast_8bit(Histogram h);
 	//pixel
 	//histogram operation
 	Image& histogram_equalisation(Histogram h);

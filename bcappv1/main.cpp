@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
     
     
     int camera_fd = open("/dev/video0", O_RDWR);
-    if (camera_fd != 0) {
+    if (camera_fd < 0) {
         //prepare camera
         capability(camera_fd);
         set_r_f(camera_fd);
@@ -51,23 +51,37 @@ int main(int argc, char* argv[])
             uint8_t* buffer = return_buf();
             size_t size = return_buf_size();
 
-            Image img(buffer, size); //create an instance of the image
+           // Image img(buffer, size); //create an instance of the image
+            Image img("/home/pi/projects/bcappv1/a.jpg");
             Histogram h;
+            
             img.write("cap.jpg");
             img.write("before.jpg");
             /* preprocessing operations */
             img.median_filter();
             img.grayscale();
-            // img.invert();
             h = img.histogram();
             h.statistics();
+           
+            int brightness = (h.min_index + h.max_index) / 2;
+            img.adjustBrightness(brightness);
+            
+            h = img.histogram();
+            h.statistics();
+           
+            img.write("bc.jpg");
+            h.imagesize = img.size;
             h = img.treshold(h);
-            if (h.binary_treshold[0] > h.binary_treshold[1]) {
+            
+           if (h.binary_treshold[0] > h.binary_treshold[1]) {
+                Image inverted = img;
                 img.invert();
-            }
+                //inverted.write("inverted.jpg");
+                h = img.histogram();
+           }
+            
+            img.median_filter();
             img.histogram_equalisation(h);
-
-
              /*this creates names for output images*/
             string numname = "capture" + to_string(capture_number) + ".jpg";
             const char* n = numname.c_str();

@@ -223,6 +223,17 @@ Image& Image::adjustContrast(float value)
 	return *this;
 }
 
+Image& Image::auto_local_contrast_8bit(Histogram h) {
+	int range_max = 255;
+	int range_min = 0;
+	for (int i = 0; i < size; i += channels) {
+		float contrast = (((data[i]) - h.max_index) / (h.min_index - h.max_index)) * range_max;
+		data[i] = clamp(contrast * data[i] + 0.5);
+		data[i+1] = clamp(contrast * data[i] + 0.5);
+		data[i+2] = clamp(contrast * data[i] + 0.5);
+	}
+	return *this;
+}
 Image& Image::boost_color(char channel) {
 	//int min = find_min(data, size);
 	int i;
@@ -255,7 +266,7 @@ Image& Image::boost_color(char channel) {
 Histogram Image::treshold(Histogram h)
 {
 	
-	int treshVal = mid_range_tresh_value(h);
+	int treshVal = h.median;
 	for (int i = 0; i < width * height * channels; i++) {
 		if (data[i] < treshVal) {
 			h.binary_treshold[0] += 1;
@@ -374,6 +385,24 @@ Image& Image::filterChannel(float r, float g, float b)
 	return *this;
 }
 
+Image& Image::auto_local_brightness(Histogram h) {
+	int value = h.max_index - h.min_index;
+	int brightness;
+	if (value < 0) { value *= -1; };
+
+	for (int i = 0; i < size; i += channels) {
+		if(data[i]>data[h.min_index] && data[i] > data[h.max_index]){
+			brightness = data[i] - value;
+			if (brightness < 0) { brightness *= -1; };
+			data[i] = clamp(value + data[i]);
+			data[i + 1] = clamp(value + data[i + 1]);
+			data[i + 2] = clamp(value + data[i + 2]);
+		}
+
+	}
+
+	return *this;
+}
 
 //useful functions
 int find_min(uint8_t arr[], size_t sz) {
@@ -389,24 +418,28 @@ int find_min(uint8_t arr[], size_t sz) {
 
 int find_min(int arr[], int sz) {
 	int min = 256;
+	int index_min = 0;
 	int i = 0;
 	for (i; i < sz; i++) {
 		if (arr[i] < min) {
 			min = arr[i];
+			index_min = i;
 		}
 	}
-	return i;
+	return index_min;
 }
 
 int find_max(int arr[], int sz) {
 	int max = 0;
+	int index_max = 0;
 	int i = 0;
 	for (i; i < sz; i++) {
 		if (arr[i] > max) {
 			max = arr[i];
+			index_max = i;
 		}
 	}
-	return i;
+	return index_max;
 }
 
 int find_max_at(int arr[], int sz) {
@@ -460,24 +493,26 @@ Image& Image::histogram_equalisation(Histogram h)
 }
 
 
-////Histogram own methods
-//Histogram& Histogram::average_value() {
-//	for (int i = 0; i < 256; i++) {
-//		histogram_data[i] = histogram_data[i] / 5;
-//	}
-//	return *this;
-//}
 
 Histogram& Histogram::statistics() { 
 	//median
-	int* median_array = histogram_data;
+	int median_array[HIST_ARRAY_SIZE];
+	for (int i = 0; i < HIST_ARRAY_SIZE; i++) {
+		median_array[i] = histogram_data[i];
+	}
 	bubble_sort(median_array, HIST_ARRAY_SIZE);
 	median = median_array[127];
+	
 	//mean
 	for (int i = 0; i < HIST_ARRAY_SIZE; i++) {
-		mean += histogram_data[i];
+		mean += histogram_data[i]*i;
 	}
-	mean = mean / 256;
+	int mean = mean / (imagesize / 3);
+	/*for (int i = 0; i < HIST_ARRAY_SIZE; i++) {
+		if (histogram_data[i] == mean_index) {
+			mean = i;
+		}
+	}*/
 	//max
 	max = histogram_data[find_max(histogram_data, HIST_ARRAY_SIZE)];
 	max_index = find_max(histogram_data, HIST_ARRAY_SIZE);
@@ -486,25 +521,10 @@ Histogram& Histogram::statistics() {
 	min_index = find_min(histogram_data, HIST_ARRAY_SIZE);
 	return *this;
 }
-Histogram Histogram::equalisation_parameters()
-{
-	return Histogram();
-}
-
-float Histogram::diffs(Histogram a, Histogram b)
-{
-	float val_a;
-	float val_b;
-	for (int i = 0; i < 256; i++) {
-		val_a += a.histogram_data[i];
-		val_b += b.histogram_data[i];
-	}
-	return val_a / val_b;
-}
 
 float mid_range_tresh_value(Histogram c)
 {
-	return (find_max_at(c.histogram_data,256)- find_min_at(c.histogram_data, 256))/2;
+	return (find_max(c.histogram_data,256)+ find_min(c.histogram_data, 256))/2;
 }
 
 void swap_sort(int* x, int* y) {
