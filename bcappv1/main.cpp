@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
     
     
     int camera_fd = open("/dev/video0", O_RDWR);
-    if (camera_fd < 0) {
+    if (camera_fd > 0) {
         //prepare camera
         capability(camera_fd);
         set_r_f(camera_fd);

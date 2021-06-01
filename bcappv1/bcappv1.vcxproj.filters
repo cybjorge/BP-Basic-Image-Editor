@@ -19,5 +19,6 @@
     <Text Include="a.txt" />
     <Text Include="possibilities.txt" />
     <Text Include="temporary_changelog.txt" />
+    <Text Include="README.txt" />
   </ItemGroup>
 </Project>
