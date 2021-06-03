@@ -261,7 +261,24 @@ Image& Image::boost_color(char channel) {
 	return *this;
 }
 
-
+Image& Image::treshold(int param) {
+	if (param> 0 && param<256) {
+		for (int i = 0; i < size; i += channels) {
+			if (data[i] < param) {
+				data[i] = 0;
+				data[i + 1] = 0;
+				data[i + 2] = 0;
+			}
+			else {
+				data[i] = 255;
+				data[i + 1] = 255;
+				data[i + 2] = 255;
+			}
+		}
+		return *this;
+	}
+	return *this;
+}
 
 Histogram Image::treshold(Histogram h)
 {

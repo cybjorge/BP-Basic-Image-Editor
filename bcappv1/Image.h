@@ -58,6 +58,7 @@ struct Image{
 
 	ImageType imageFileType(const char* filename);
 	//point operations declarations
+	Image& treshold(int param);
 	Image& grayscale ();
 	Image& filterChannel(float r, float g, float b);
 	Image& adjustContrast(float value);
