@@ -55,8 +55,8 @@ int main(int argc, char* argv[])
             //Image img("/home/pi/projects/bcappv1/a.jpg");
             Histogram h;
             
-            img.write("cap.jpg");
-            img.write("before.jpg");
+           //img.write("cap.jpg");
+           // img.write("before.jpg");
             /* preprocessing operations */
             img.median_filter();
             img.grayscale();
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
             h = img.histogram();
             h.statistics();
            
-            img.write("bc.jpg");
+        //    img.write("bc.jpg");
             h.imagesize = img.size;
             h = img.treshold(h);
             
